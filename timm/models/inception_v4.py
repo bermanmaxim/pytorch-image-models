@@ -2,16 +2,20 @@
 Sourced from https://github.com/Cadene/tensorflow-model-zoo.torch (MIT License) which is
 based upon Google's Tensorflow implementation and pretrained weights (Apache 2.0 License)
 """
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from .registry import register_model
 from .helpers import load_pretrained
-from .adaptive_avgmax_pool import *
+from .adaptive_avgmax_pool import select_adaptive_pool2d
 from timm.data import IMAGENET_INCEPTION_MEAN, IMAGENET_INCEPTION_STD
 
-_models = ['inception_v4']
-__all__ = ['InceptionV4'] + _models
+__all__ = ['InceptionV4']
 
 default_cfgs = {
     'inception_v4': {
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth',
+        'url': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-cadene/inceptionv4-8e4777a0.pth',
         'num_classes': 1001, 'input_size': (3, 299, 299), 'pool_size': (8, 8),
         'crop_pct': 0.875, 'interpolation': 'bicubic',
         'mean': IMAGENET_INCEPTION_MEAN, 'std': IMAGENET_INCEPTION_STD,
@@ -293,7 +297,8 @@ class InceptionV4(nn.Module):
         return x
 
 
-def inception_v4(num_classes=1000, in_chans=3, pretrained=False, **kwargs):
+@register_model
+def inception_v4(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
     default_cfg = default_cfgs['inception_v4']
     model = InceptionV4(num_classes=num_classes, in_chans=in_chans, **kwargs)
     model.default_cfg = default_cfg

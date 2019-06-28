@@ -21,21 +21,21 @@ normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
 
 The resize parameter of the validation transform should be 333, and make sure to center crop at 299x299
 """
-from __future__ import print_function, division, absolute_import
 import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .registry import register_model
 from .helpers import load_pretrained
 from .adaptive_avgmax_pool import select_adaptive_pool2d
 
-_models = ['xception']
-__all__ = ['Xception'] + _models
+__all__ = ['Xception']
 
 default_cfgs = {
     'xception': {
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth',
+        'url': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-cadene/xception-43020ad28.pth',
         'input_size': (3, 299, 299),
         'crop_pct': 0.8975,
         'interpolation': 'bicubic',
@@ -228,7 +228,8 @@ class Xception(nn.Module):
         return x
 
 
-def xception(num_classes=1000, in_chans=3, pretrained=False, **kwargs):
+@register_model
+def xception(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
     default_cfg = default_cfgs['xception']
     model = Xception(num_classes=num_classes, in_chans=in_chans, **kwargs)
     model.default_cfg = default_cfg
