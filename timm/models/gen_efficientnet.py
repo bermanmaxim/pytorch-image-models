@@ -80,6 +80,7 @@ default_cfgs = {
     'efficientnet_b0': _cfg(
         url='https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/efficientnet_b0-d6904d92.pth',
         interpolation='bicubic'),
+    'efficientnet_b0_light': _cfg(url='', interpolation='bicubic'),
     'efficientnet_b1': _cfg(
         url='https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/efficientnet_b1-533bc792.pth',
         input_size=(3, 240, 240), pool_size=(8, 8), interpolation='bicubic', crop_pct=0.882),
@@ -1426,6 +1427,21 @@ def efficientnet_b0(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
 
 
 @register_model
+def efficientnet_b0_light(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
+    """ EfficientNet-B0 """
+    default_cfg = default_cfgs['efficientnet_b0']
+    # NOTE for train, drop_rate should be 0.2
+    #kwargs['drop_connect_rate'] = 0.2  # set when training, TODO add as cmd arg
+    model = _gen_efficientnet(
+        channel_multiplier=0.51, depth_multiplier=0.28,
+        num_classes=num_classes, in_chans=in_chans, **kwargs)
+    model.default_cfg = default_cfg
+    if pretrained:
+        load_pretrained(model, default_cfg, num_classes, in_chans)
+    return model
+
+
+@register_model
 def efficientnet_b1(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
     """ EfficientNet-B1 """
     default_cfg = default_cfgs['efficientnet_b1']
@@ -1513,7 +1529,6 @@ def tf_efficientnet_b0(pretrained=False, num_classes=1000, in_chans=3, **kwargs)
     if pretrained:
         load_pretrained(model, default_cfg, num_classes, in_chans)
     return model
-
 
 @register_model
 def tf_efficientnet_b1(pretrained=False, num_classes=1000, in_chans=3, **kwargs):
